@@ -1,0 +1,10 @@
+.paket/
+packages/
+paket-files/
+.ionide/
+bin/
+obj/
+output/
+.fake/
+build/
+.vscode/
