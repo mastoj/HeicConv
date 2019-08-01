@@ -66,11 +66,18 @@ with
             | Dir _ -> "Directory to convert"
             | Outdir _ -> "Directory to store the output (will store side by side if not provided)"
 
+let getParser() =
+    ArgumentParser.Create<Argument>(programName = "heiconv.exe")
+
 let parseArguments args =
-    let parser = ArgumentParser.Create<Argument>(programName = "heiconv.exe")
+    let parser = getParser()
     let usage = parser.PrintUsage()
     let result = parser.Parse args
     result.GetAllResults()
+
+let printUsage() =
+    getParser().PrintUsage()
+    |> printfn "%A"
 
 type JobType =
     | SingleFile of path: string
@@ -94,8 +101,8 @@ let validateArguments (arguments: Argument list) =
         arguments
         |> List.fold folder (None, None)
     match (jobType, targetDir) with
-    | Some jt, x -> { JobType = jt; TargetDir = x }
-    | _, _ -> raise (exn "Invalid arguments")
+    | Some jt, x -> Ok { JobType = jt; TargetDir = x }
+    | _, _ -> Error "Invalid arguments"
 
 let getAllHeicFilesFromDirectory path =
     Directory.GetFiles(path |> getFullPath, "*." + (Heic |> fileTypeToExt)) |> List.ofArray
@@ -107,11 +114,14 @@ let executeJob job =
     | Directory path ->
         getAllHeicFilesFromDirectory path
         |> List.iter simpleConvert
+    |> Ok
 
 [<EntryPoint>]
 let main argv =
     argv
     |> parseArguments
     |> validateArguments
-    |> executeJob
+    |> Result.bind executeJob
+    |> Result.mapError (fun err -> printfn "Error: %s" err; printUsage())
+    |> ignore
     0 // return an integer exit code
