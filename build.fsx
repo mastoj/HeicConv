@@ -140,6 +140,7 @@ Target.create "CopyBinaries" (fun _ ->
 )
 
 Target.create "ReleaseGitHub" (fun _ ->
+    printfn "==> Releasing to github"
     let remote =
         Git.CommandHelper.getGitResult "" "remote -v"
         |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
@@ -157,8 +158,12 @@ Target.create "ReleaseGitHub" (fun _ ->
     let client =
         let token =
             match getBuildParam "github_token" with
-            | s when not (isNullOrWhiteSpace s) -> s
-            | _ -> UserInput.getUserInput "Token: "
+            | s when not (isNullOrWhiteSpace s) -> 
+                printfn "==> Have a token"
+                s
+            | _ ->
+                printfn "==> Missing github token"
+                UserInput.getUserInput "Token: "
 
         // Git.createClient user pw
         GitHub.createClientWithToken token

@@ -24,5 +24,5 @@ steps:
     installationPath: $(Agent.ToolsDirectory)/dotnet
 - script: dotnet tool install fake-cli -g
   displayName: 'Install fake'
-- script: fake build -- -t ReleaseGitHub
+- script: fake -v build -- -t ReleaseGitHub
   displayName: 'Execute build script'
