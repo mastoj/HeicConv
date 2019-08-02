@@ -15,7 +15,12 @@ steps:
     packageType: sdk
     version: 3.0.100-preview7-012821
     installationPath: $(Agent.ToolsDirectory)/dotnet
-# Starter pipeline
+- task: UseDotNet@2
+  displayName: 'Install .NET Core 2.1'
+  inputs:
+    packageType: sdk
+    version: 2.1.x
+    installationPath: $(Agent.ToolsDirectory)/dotnet
 - task: FAKE5@1
   inputs:
     FakeVersion: '5.4.1'
