@@ -142,16 +142,24 @@ Target.create "CopyBinaries" (fun _ ->
 Target.create "ReleaseGitHub" (fun _ ->
     printfn "==> Releasing to github"
     let remote =
-        Git.CommandHelper.getGitResult "" "remote -v"
-        |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-        |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-        |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
-
+        try 
+            let r =
+                Git.CommandHelper.getGitResult "" "remote -v"
+            printfn "==> r: %A" r
+            r
+            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
+            |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
+            |> function 
+                | None -> gitHome + "/" + gitName 
+                | Some (s: string) -> s.Split().[0]
+        with
+        | _ -> gitHome + "/" + gitName
+//    raise (exn "KILL ME")
     // Git.Staging.stageAll ""
     // Git.Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
     // Git.Branches.pushBranch "" remote (Git.Information.getBranchName "")
 
-
+    printfn "==> Creating tags"
     Git.Branches.tag "" release.NugetVersion
     Git.Branches.pushTag "" remote release.NugetVersion
 
