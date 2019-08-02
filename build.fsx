@@ -141,31 +141,31 @@ Target.create "CopyBinaries" (fun _ ->
 
 Target.create "ReleaseGitHub" (fun _ ->
     printfn "==> Releasing to github"
-    let remote =
-        try 
-            let r =
-                Git.CommandHelper.getGitResult "" "remote -v"
-            printfn "==> r: %A" r
-            r
-            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-            |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-            |> function 
-                | None -> gitHome + "/" + gitName 
-                | Some (s: string) -> s.Split().[0]
-        with
-        | _ -> gitHome + "/" + gitName
+    // let remote =
+    //     try 
+    //         let r =
+    //             Git.CommandHelper.getGitResult "" "remote -v"
+    //         printfn "==> r: %A" r
+    //         r
+    //         |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
+    //         |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
+    //         |> function 
+    //             | None -> gitHome + "/" + gitName 
+    //             | Some (s: string) -> s.Split().[0]
+    //     with
+    //     | _ -> gitHome + "/" + gitName
 //    raise (exn "KILL ME")
     // Git.Staging.stageAll ""
     // Git.Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
     // Git.Branches.pushBranch "" remote (Git.Information.getBranchName "")
 
-    printfn "==> Creating tags"
-    Git.Branches.tag "" release.NugetVersion
-    Git.Branches.pushTag "" remote release.NugetVersion
+    // printfn "==> Creating tags"
+    // Git.Branches.tag "" release.NugetVersion
+    // Git.Branches.pushTag "" remote release.NugetVersion
 
     let client =
         let token =
-            match getBuildParam "github_token" with
+            match getBuildParam "GITHUB_TOKEN" with
             | s when not (isNullOrWhiteSpace s) -> 
                 printfn "==> Have a token"
                 s
@@ -176,6 +176,13 @@ Target.create "ReleaseGitHub" (fun _ ->
         // Git.createClient user pw
         GitHub.createClientWithToken token
     let files = !! (buildDir </> "out/*")
+
+    let tag = Octokit.NewTag()
+    tag.Tag <- release.NugetVersion
+    async {
+        let! c = client
+        do! c.Git.Tag.Create(gitOwner, gitName, tag) |> Async.AwaitTask |> Async.Ignore
+    } |> Async.RunSynchronously
 
     // release on github
     let cl =
