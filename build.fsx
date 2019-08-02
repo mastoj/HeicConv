@@ -165,7 +165,7 @@ Target.create "ReleaseGitHub" (fun _ ->
 
     let client =
         let token =
-            match getBuildParam "GITHUB_TOKEN" with
+            match getBuildParam "github_token" with
             | s when not (isNullOrWhiteSpace s) -> 
                 printfn "==> Have a token"
                 s

@@ -10,9 +10,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: set
-  displayName: 'show all env variables'
-- script: echo $GITHUB_TOKEN
+- script: github_token=$(GITHUB_TOKEN) echo $github_token
   displayName: 'What is the token'
 - task: UseDotNet@2
   displayName: 'Install .NET Core'
@@ -28,5 +26,5 @@ steps:
     installationPath: $(Agent.ToolsDirectory)/dotnet
 - script: dotnet tool install fake-cli -g
   displayName: 'Install fake'
-- script: fake -v build -- -t ReleaseGitHub
+- script: github_token=$(GITHUB_TOKEN) fake -v build -- -t ReleaseGitHub
   displayName: 'Execute build script'
