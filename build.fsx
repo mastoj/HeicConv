@@ -179,6 +179,8 @@ Target.create "ReleaseGitHub" (fun _ ->
 
     let tag = Octokit.NewTag()
     tag.Tag <- release.NugetVersion
+    tag.Message <- release.NugetVersion
+    tag.Object <- (Git.Information.getCurrentSHA1("./"))
     async {
         let! c = client
         do! c.Git.Tag.Create(gitOwner, gitName, tag) |> Async.AwaitTask |> Async.Ignore
