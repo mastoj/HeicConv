@@ -1,3 +1,7 @@
+### 0.2.2 - 02.08.2019
+
+* Nothing new, but testing CI
+  
 ### 0.2.1 - 01.08.2019
 
 * Slightly better error handling
