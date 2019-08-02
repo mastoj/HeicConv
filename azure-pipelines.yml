@@ -1,3 +1,4 @@
+# Starter pipeline
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
@@ -21,7 +22,7 @@ steps:
     packageType: sdk
     version: 2.1.x
     installationPath: $(Agent.ToolsDirectory)/dotnet
-- task: FAKE5@1
-  inputs:
-    FakeVersion: '5.4.1'
-    FakeScript: 'build.fsx'
+- script: dotnet tool install fake-cli -g
+  displayName: 'Install fake'
+- script: fake build
+  displayName: 'Execute build script'
