@@ -146,9 +146,9 @@ Target.create "ReleaseGitHub" (fun _ ->
         |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
         |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
 
-    Git.Staging.stageAll ""
-    Git.Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
-    Git.Branches.pushBranch "" remote (Git.Information.getBranchName "")
+    // Git.Staging.stageAll ""
+    // Git.Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
+    // Git.Branches.pushBranch "" remote (Git.Information.getBranchName "")
 
 
     Git.Branches.tag "" release.NugetVersion
